@@ -21,11 +21,11 @@ public class Schedule extends Timestamped {
     private String subject;
     @Column(name = "contents", nullable = false, length = 500)
     private String contents;
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     private List<Comment> commentList = new ArrayList<>();
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     private List<UserSchedule> userScheduleList = new ArrayList<>();
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 

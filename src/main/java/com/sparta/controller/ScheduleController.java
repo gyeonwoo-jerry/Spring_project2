@@ -3,6 +3,7 @@ package com.sparta.controller;
 import com.sparta.dto.ScheduleRequestDto;
 import com.sparta.dto.ScheduleResponseDto;
 import com.sparta.service.ScheduleService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +24,12 @@ public class ScheduleController {
     }
 
     @GetMapping("/schedule")
-    public List<ScheduleResponseDto> getSchedules() {
-        return scheduleService.getSchedules();
+    public Page<ScheduleResponseDto> getSchedules(
+            @RequestParam("page") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "modifiedAt") String sortBy,
+            @RequestParam(defaultValue = "false") boolean isAsc) {
+        return scheduleService.getSchedules(page-1,size, sortBy, isAsc);
     }
 
     @PutMapping("/schedule/{id}")

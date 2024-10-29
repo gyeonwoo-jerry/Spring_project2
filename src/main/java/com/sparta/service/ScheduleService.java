@@ -9,6 +9,10 @@ import com.sparta.repository.ScheduleRepository;
 import com.sparta.repository.UserRepository;
 import com.sparta.repository.UserScheduleRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +29,16 @@ public class ScheduleService {
         this.scheduleRepository = scheduleRepository;
         this.userRepository = userRepository;
         this.userScheduleRepository = userScheduleRepository;
+    }
+
+    public Page<ScheduleResponseDto> paging(Pageable pageable) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 3;
+
+        Page<Schedule> SchedulePages = scheduleRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "ModifiedAt")));
+
+        Page<ScheduleResponseDto> scheduleResponseDtos = SchedulePages.map(schedulePage -> new ScheduleResponseDto(schedulePage));
+        return scheduleResponseDtos;
     }
 
     @Transactional
@@ -49,9 +63,14 @@ public class ScheduleService {
         return scheduleResponseDto;
     }
 
-    public List<ScheduleResponseDto> getSchedules() {
-        // DB 조회
-        return scheduleRepository.findAllByOrderByModifiedAtDesc().stream().map(ScheduleResponseDto::new).toList();
+    public Page<ScheduleResponseDto> getSchedules(int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Schedule> ScheduleList = scheduleRepository.findAll(pageable);
+
+        return ScheduleList.map(ScheduleResponseDto::new);
     }
 
     @Transactional

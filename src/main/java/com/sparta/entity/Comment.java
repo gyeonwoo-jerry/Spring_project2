@@ -16,10 +16,10 @@ public class Comment extends Timestamped {
     private Long id;
     @Column(name = "contents", nullable = false, length = 500)
     private String contents;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
