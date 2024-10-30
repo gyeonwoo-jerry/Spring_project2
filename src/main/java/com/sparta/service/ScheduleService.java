@@ -31,31 +31,13 @@ public class ScheduleService {
         this.userScheduleRepository = userScheduleRepository;
     }
 
-    public Page<ScheduleResponseDto> paging(Pageable pageable) {
-        int page = pageable.getPageNumber() - 1;
-        int pageLimit = 3;
-
-        Page<Schedule> SchedulePages = scheduleRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "ModifiedAt")));
-
-        Page<ScheduleResponseDto> scheduleResponseDtos = SchedulePages.map(schedulePage -> new ScheduleResponseDto(schedulePage));
-        return scheduleResponseDtos;
-    }
-
     @Transactional
-    public ScheduleResponseDto createSchedule(ScheduleRequestDto requestDto) {
-        User user = userRepository.findById(requestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
-
+    public ScheduleResponseDto createSchedule(ScheduleRequestDto requestDto, User user) {
         // RequestDto -> Entity
         Schedule schedule = new Schedule(requestDto.getSubject(), requestDto.getContents(), user);
 
         // DB 저장
         Schedule saveSchedule = scheduleRepository.save(schedule);
-
-        // User스케줄에 대한 데이터 삽입
-        UserSchedule userSchedule = new UserSchedule(user, saveSchedule);
-
-        // DB 저장
-        userScheduleRepository.save(userSchedule);
 
         // Entity -> ResponseDto
         ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(saveSchedule);
@@ -73,28 +55,41 @@ public class ScheduleService {
         return ScheduleList.map(ScheduleResponseDto::new);
     }
 
-    @Transactional
-    public Long updateSchedule(Long id, ScheduleRequestDto requestDto) {
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        // 해당 schedule이 DB에 존재하는지 확인
-        Schedule schedule = findSchedule(id);
-
-        // schedule 내용 수정
-        schedule.update(user, requestDto.getSubject(), requestDto.getContents());
-
-        return id;
+    //선택조회
+    public ScheduleResponseDto getSchedule(Long scheduleId) {
+        Schedule schedule = findSchedule(scheduleId);
+        ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(schedule);
+        return scheduleResponseDto;
     }
 
     @Transactional
-    public Long deleteSchedule(Long id) {
+    public void updateSchedule(Long scheduleId, ScheduleRequestDto requestDto, User user) {
+        Long userId = user.getId();
+
         // 해당 schedule이 DB에 존재하는지 확인
-        Schedule schedule = findSchedule(id);
+        Schedule schedule = findSchedule(scheduleId);
+
+        if (schedule.getUser().getId() != userId) {
+            throw new IllegalArgumentException("해당 유저는 수정을 할 수 없습니다.");
+        }
+
+        // schedule 내용 수정
+        schedule.update(requestDto.getSubject(), requestDto.getContents());
+    }
+
+    @Transactional
+    public void deleteSchedule(Long scheduleId, User user) {
+        Long userId = user.getId();
+
+        // 해당 schedule이 DB에 존재하는지 확인
+        Schedule schedule = findSchedule(scheduleId);
+
+        if (schedule.getUser().getId() != userId) {
+            throw new IllegalArgumentException("해당 유저는 삭제를 할 수 없습니다.");
+        }
 
         // schedule 삭제
         scheduleRepository.delete(schedule);
-
-        return id;
     }
 
     private Schedule findSchedule(Long id) {

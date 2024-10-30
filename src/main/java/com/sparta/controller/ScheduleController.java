@@ -2,14 +2,17 @@ package com.sparta.controller;
 
 import com.sparta.dto.ScheduleRequestDto;
 import com.sparta.dto.ScheduleResponseDto;
+import com.sparta.entity.User;
 import com.sparta.service.ScheduleService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/schedule")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -18,27 +21,45 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
     }
 
-    @PostMapping("/schedule")
-    public ScheduleResponseDto createSchedule(@RequestBody ScheduleRequestDto requestDto) {
-        return scheduleService.createSchedule(requestDto);
+    // 일정생성
+    @PostMapping()
+    public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody @Valid ScheduleRequestDto requestDto, HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute("user");
+        ScheduleResponseDto responseDto = scheduleService.createSchedule(requestDto, user);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(responseDto);
     }
 
-    @GetMapping("/schedule")
+    // 전체 일정 조회
+    @GetMapping()
     public Page<ScheduleResponseDto> getSchedules(
-            @RequestParam("page") int page,
+            @RequestParam(value = "page",defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "modifiedAt") String sortBy,
             @RequestParam(defaultValue = "false") boolean isAsc) {
-        return scheduleService.getSchedules(page-1,size, sortBy, isAsc);
+        return scheduleService.getSchedules(page,size, sortBy, isAsc);
     }
 
-    @PutMapping("/schedule/{id}")
-    public Long updateSchedule(@PathVariable("id") Long id, @RequestBody ScheduleRequestDto requestDto) {
-        return scheduleService.updateSchedule(id, requestDto);
+    // 선택일정 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable Long scheduleId) {
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getSchedule(scheduleId));
     }
 
-    @DeleteMapping("/schedule/{id}")
-    public Long deleteSchedule(@PathVariable("id") Long id) {
-        return scheduleService.deleteSchedule(id);
+    // 일정 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateSchedule(@PathVariable("id") Long scheduleId, @RequestBody @Valid ScheduleRequestDto requestDto, HttpServletRequest request) {
+        User user = (User) request.getAttribute("user");
+        scheduleService.updateSchedule(scheduleId, requestDto, user);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    // 일정 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSchedule(@PathVariable("id") Long scheduleId, HttpServletRequest request) {
+        User user = (User) request.getAttribute("user");
+        scheduleService.deleteSchedule(scheduleId, user);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

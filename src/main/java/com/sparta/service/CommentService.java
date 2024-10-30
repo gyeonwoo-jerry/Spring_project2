@@ -30,8 +30,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDto createComment(CommentRequestDto requestDto) {
-        User user = userRepository.findById(requestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public CommentResponseDto createComment(CommentRequestDto requestDto, User user) {
         Schedule schedule = scheduleRepository.findById(requestDto.getScheduleId()).orElseThrow(() -> new EntityNotFoundException("Schedule not found"));
 
         Comment comment = new Comment(requestDto.getContents(), user, schedule);
@@ -50,24 +49,43 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDto updateComment(Long id, CommentUpdateRequestDto requestDto) {
-//        User user = userRepository.findById(requestDto.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
-
+    public CommentResponseDto updateComment(Long id, CommentUpdateRequestDto requestDto, User user) {
+        // 유효성 검사 -> 해당 일정 존재여부 -> 댓글 존재 여부 -> 유저 존재 여부->
         Comment comment = commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Comment not found"));
 
+        Long author = comment.getUser().getId();
+        Long scheduleId = comment.getSchedule().getId();
+        Long myId = user.getId();
+
+        scheduleRepository.findById(scheduleId).orElseThrow(() -> new EntityNotFoundException("Schedule not found"));
+
+        if (!author.equals(myId)) {
+            throw new EntityNotFoundException("User not found");
+        }
+
         comment.setContents(requestDto.getContents());
+
+        commentRepository.save(comment);
 
         CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
 
         return commentResponseDto;
     }
 
-    public Long deleteComment(Long id) {
+    public void deleteComment(Long id, User user) {
 
         Comment comment = commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Comment not found"));
 
-        commentRepository.delete(comment);
+        Long author = comment.getUser().getId();
+        Long scheduleId = comment.getSchedule().getId();
+        Long myId = user.getId();
 
-        return id;
+        scheduleRepository.findById(scheduleId).orElseThrow(() -> new EntityNotFoundException("Schedule not found"));
+
+        if (!author.equals(myId)) {
+            throw new EntityNotFoundException("User not found");
+        }
+
+        commentRepository.delete(comment);
     }
 }

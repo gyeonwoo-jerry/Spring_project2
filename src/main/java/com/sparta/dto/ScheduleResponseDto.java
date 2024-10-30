@@ -16,7 +16,7 @@ public class ScheduleResponseDto {
 
     public ScheduleResponseDto(Schedule saveSchedule) {
         this.id = saveSchedule.getId();
-        this.username = saveSchedule.getCreator().getUsername();
+        this.username = saveSchedule.getUser().getUsername();
         this.subject = saveSchedule.getSubject();
         this.contents = saveSchedule.getContents();
         this.createdAt = saveSchedule.getCreatedAt();

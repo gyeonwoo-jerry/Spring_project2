@@ -73,7 +73,8 @@ public class UserService {
     // ADMIN_TOKEN
     private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
 
-    public void signup(SignupRequestDto requestDto) {
+    @Transactional
+    public void signup(SignupRequestDto requestDto, HttpServletResponse res) {
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());
 
@@ -101,7 +102,11 @@ public class UserService {
 
         // 사용자 등록
         User user = new User(username, password, email, role);
-        userRepository.save(user);
+        User saveUser = userRepository.save(user);
+
+        // 토큰 생성 및 주입
+        String token = jwtUtil.createToken(saveUser.getEmail(), saveUser.getRole());
+        jwtUtil.addJwtToCookie(token, res);
     }
 
     public void login(LoginRequestDto requestDto, HttpServletResponse res) {

@@ -27,15 +27,15 @@ public class Schedule extends Timestamped {
     private List<UserSchedule> userScheduleList = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
-    private User creator;
+    private User user;
 
-    public Schedule(String subject, String contents, User creator) {
+    public Schedule(String subject, String contents, User user) {
         this.subject = subject;
         this.contents = contents;
-        this.creator = creator;
+        this.user = user;
     }
 
-    public void update(User user, String subject, String contents) {
+    public void update(String subject, String contents) {
         this.contents = contents;
         this.subject = subject;
     }
