@@ -16,6 +16,7 @@ import java.util.List;
 public class Schedule extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "schedule_id", nullable = false)
     private Long id;
     @Column
     private String subject;
@@ -26,7 +27,7 @@ public class Schedule extends Timestamped {
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     private List<UserSchedule> userScheduleList = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     public Schedule(String subject, String contents, User user) {

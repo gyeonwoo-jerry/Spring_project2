@@ -1,12 +1,11 @@
 package com.sparta.controller;
 
-import com.sparta.dto.LoginRequestDto;
-import com.sparta.dto.SignupRequestDto;
-import com.sparta.dto.UserRequestDto;
-import com.sparta.dto.UserResponseDto;
+import com.sparta.dto.*;
 import com.sparta.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,17 +39,18 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public String signup(@Valid SignupRequestDto requestDto, HttpServletResponse res) {
+    public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequestDto requestDto, HttpServletResponse res) {
         userService.signup(requestDto, res);
-
-        return "회원가입이 잘되었습니다.";
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
     }
 
     @PostMapping("/login")
-    public String login(@Valid LoginRequestDto requestDto, HttpServletResponse res) {
+    public String login(@Valid @RequestBody LoginRequestDto requestDto, HttpServletResponse res) {
         try {
             userService.login(requestDto, res);
-        } catch (Exception e) {
+        } catch (Exception e)   {
             return "다시입력해주세요";
         }
 

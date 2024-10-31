@@ -1,18 +1,18 @@
 package com.sparta.service;
 
 import com.sparta.dto.LoginRequestDto;
-import com.sparta.springauth.entity.UserRoleEnum;
 import com.sparta.dto.SignupRequestDto;
 import com.sparta.dto.UserRequestDto;
 import com.sparta.dto.UserResponseDto;
 import com.sparta.entity.User;
+import com.sparta.entity.UserRoleEnum;
+import com.sparta.jwt.JwtUtil;
 import com.sparta.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.sparta.springauth.jwt.JwtUtil;
 
 import java.util.Optional;
 
@@ -92,19 +92,19 @@ public class UserService {
         }
 
         // 사용자 ROLE 확인
-        com.sparta.springauth.entity.UserRoleEnum role = UserRoleEnum.USER;
+        UserRoleEnum role = UserRoleEnum.USER;
         if (requestDto.isAdmin()) {
             if (!ADMIN_TOKEN.equals(requestDto.getAdminToken())) {
                 throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
             }
-            role = com.sparta.springauth.entity.UserRoleEnum.ADMIN;
+            role = UserRoleEnum.ADMIN;
         }
 
         // 사용자 등록
         User user = new User(username, password, email, role);
         User saveUser = userRepository.save(user);
 
-        // 토큰 생성 및 주입
+        // 토큰 생성 및 추가
         String token = jwtUtil.createToken(saveUser.getEmail(), saveUser.getRole());
         jwtUtil.addJwtToCookie(token, res);
     }

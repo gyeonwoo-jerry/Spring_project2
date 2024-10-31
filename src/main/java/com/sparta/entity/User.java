@@ -1,6 +1,5 @@
 package com.sparta.entity;
 
-import com.sparta.springauth.entity.UserRoleEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +17,7 @@ import java.util.List;
 public class User extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id", nullable = false)
     private Long id;
 
     @Column(name = "username", nullable = false)
@@ -32,6 +32,9 @@ public class User extends Timestamped {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
+
+    @OneToMany(mappedBy = "user")
+    private List<Schedule> scheduleList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<Comment> commentList = new ArrayList<>();

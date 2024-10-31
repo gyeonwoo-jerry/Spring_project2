@@ -25,27 +25,27 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(@RequestBody @Valid CommentRequestDto requestDto, HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute("user");
+        User user = (User) request.getAttribute("user");
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(commentService.createComment(requestDto, user));
     }
 
     @GetMapping("/{id}")
-    public List<CommentResponseDto> getComment(@RequestParam("scheduleId") Long scheduleId) {
+    public List<CommentResponseDto> getComment(@PathVariable ("id") Long scheduleId) {
         return commentService.getComments(scheduleId);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateComment(@PathVariable("id") Long id, @RequestBody @Valid CommentUpdateRequestDto requestDto, HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute("user");
+        User user = (User) request.getAttribute("user");
         commentService.updateComment(id, requestDto, user);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable("id") Long id, HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute("user");
+        User user = (User) request.getAttribute("user");
         commentService.deleteComment(id, user);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

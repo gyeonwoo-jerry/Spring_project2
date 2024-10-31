@@ -4,11 +4,7 @@ import com.sparta.dto.ScheduleRequestDto;
 import com.sparta.dto.ScheduleResponseDto;
 import com.sparta.entity.Schedule;
 import com.sparta.entity.User;
-import com.sparta.entity.UserSchedule;
 import com.sparta.repository.ScheduleRepository;
-import com.sparta.repository.UserRepository;
-import com.sparta.repository.UserScheduleRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,19 +12,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
-    private final UserRepository userRepository;
-    private final UserScheduleRepository userScheduleRepository;
 
-    public ScheduleService(ScheduleRepository scheduleRepository, UserRepository userRepository, UserScheduleRepository userScheduleRepository) {
+    public ScheduleService(ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
-        this.userRepository = userRepository;
-        this.userScheduleRepository = userScheduleRepository;
     }
 
     @Transactional

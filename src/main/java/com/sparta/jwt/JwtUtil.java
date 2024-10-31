@@ -1,4 +1,4 @@
-package com.sparta.springauth.jwt;
+package com.sparta.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import com.sparta.entity.UserRoleEnum;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -45,7 +46,7 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String createToken(String email, com.sparta.springauth.entity.UserRoleEnum role) {
+    public String createToken(String email,  UserRoleEnum role) {
         Date date = new Date();
 
         return BEARER_PREFIX +

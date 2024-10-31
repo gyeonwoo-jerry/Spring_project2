@@ -8,7 +8,6 @@ import com.sparta.entity.Schedule;
 import com.sparta.entity.User;
 import com.sparta.repository.CommentRepository;
 import com.sparta.repository.ScheduleRepository;
-import com.sparta.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +18,10 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
 
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository, ScheduleRepository scheduleRepository) {
+    public CommentService(CommentRepository commentRepository, ScheduleRepository scheduleRepository) {
         this.commentRepository = commentRepository;
-        this.userRepository = userRepository;
         this.scheduleRepository = scheduleRepository;
 
     }

@@ -24,7 +24,7 @@ public class ScheduleController {
     // 일정생성
     @PostMapping()
     public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody @Valid ScheduleRequestDto requestDto, HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute("user");
+        User user = (User) request.getAttribute("user");
         ScheduleResponseDto responseDto = scheduleService.createSchedule(requestDto, user);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -43,7 +43,7 @@ public class ScheduleController {
 
     // 선택일정 조회
     @GetMapping("/{id}")
-    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable Long scheduleId) {
+    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable ("id")Long scheduleId) {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getSchedule(scheduleId));
     }
 
